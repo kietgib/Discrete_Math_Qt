@@ -12,7 +12,6 @@ add_executable(${PROJECT_NAME}
     main.cpp
     CourseGraph.cpp
     CourseGraph.h
-    CourseGraph.cpp
 )
 
 # Thêm resource QML
