@@ -10,69 +10,88 @@ CourseGraph::CourseGraph(QObject *parent) : QObject(parent) {
 void CourseGraph::buildSampleGraph() {
     m_courses = {
         // Semester 1
-        "LLCT130105E - Philosophy of Marxism-Leninism",
-        "MATH132401E - Calculus 1",
-        "ACEN340535E - Academic English 1",
-        "ACEN340635E - Academic English 2",
-        "INIT130185E - Introduction to IT",
-        "INPR130285E - Introduction to Programming",
-        "PHED110130 - Physical Education 1",
+        "Philosophy of Marxism-Leninism",
+        "Calculus 1",
+        "Academic English 1",
+        "Academic English 2",
+        "Introduction to IT",
+        "Introduction to Programming",
+        "Physical Education 1",
 
         // Semester 2
-        "LLCT120205E - Political Economics of Marxism-Leninism",
-        "MATH132501E - Calculus 2",
-        "MATH143001E - Linear Algebra and Algebraic Structure",
-        "ACEN440735E - Academic English 3",
-        "ACEN440835E - Academic English 4",
-        "PRTE230385E - Programming Techniques",
-        "PHYS130902E - Physics 1",
-        "PHED110230 - Physical Education 2",
+        "Political Economics of Marxism-Leninism",
+        "Calculus 2",
+        "Linear Algebra and Algebraic Structure",
+        "Academic English 3",
+        "Academic English 4",
+        "Programming Techniques",
+        "Physics 1",
+        "Physical Education 2",
 
         // Semester 3
-        "LLCT120405E - Scientific Socialism",
-        "DIGR230485E - Discrete Mathematics & Graphs Theory",
-        "DASA230179E - Data Structure and Algorithm",
-        "OOPR230279E - Object-Oriented Programming",
-        "EEEN231780E - Basic Electronics (IT)",
-        "DBSY230184E - Database Systems",
-        "PHYS111202E - Physics 1 Lab",
-        "PHED110330 - Physical Education 3",
+        "Scientific Socialism",
+        "Discrete Mathematics & Graphs Theory",
+        "Data Structure and Algorithm",
+        "Object-Oriented Programming",
+        "Basic Electronics (IT)",
+        "Database Systems",
+        "Physics 1 Lab",
+        "Physical Education 3",
 
         // Semester 4
-        "LLCT120505E - Ho Chi Minh Ideology",
-        "OPSY230186E - Operating Systems",
-        "PRCO230383E - Probability & Statistics",
-        "SOEN230289E - Software Engineering",
-        "ARCH230189E - Computer Architecture",
-        "INTE230187E - Computer Networks",
-        "PHED110430 - Physical Education 4",
+        "Ho Chi Minh Ideology",
+        "Operating Systems",
+        "Probability & Statistics",
+        "Software Engineering",
+        "Computer Architecture",
+        "Computer Networks",
+        "Physical Education 4",
 
         // Semester 5
-        "LLCT120605E - History of Vietnamese Communist Party",
-        "SYDE230281E - Systems Analysis and Design",
-        "PRNE230282E - Computer Networking Practice",
-        "WEBP230286E - Web Programming",
-        "PRDA230284E - Principles of Data Analytics",
-        "MOPR230287E - Mobile Programming",
-        "PRSY230288E - Principles of Information Security",
+        "History of Vietnamese Communist Party",
+        "Systems Analysis and Design",
+        "Computer Networking Practice",
+        "Web Programming",
+        "Principles of Data Analytics",
+        "Mobile Programming",
+        "Principles of Information Security",
 
         // Semester 6
-        "INTR230290E - Information Retrieval",
-        "MALE230291E - Machine Learning",
-        "IMPR230292E - Image Processing",
-        "DIST230293E - Distributed Systems",
-        "HUPR230294E - Human-Computer Interaction",
-        "CLOD230295E - Cloud Computing",
+        "Information Retrieval",
+        "Machine Learning",
+        "Image Processing",
+        "Distributed Systems",
+        "Human-Computer Interaction",
+        "Cloud Computing",
 
         // Semester 7
-        "NEST230296E - Network Security",
-        "PRPR230297E - Programming Paradigms",
-        "NEDE230298E - Neural Networks & Deep Learning",
-        "CAPS330399E - Capstone Project 1",
+        "Network Security",
+        "Programming Paradigms",
+        "Neural Networks & Deep Learning",
+        "Capstone Project 1",
 
         // Semester 8
-        "CAPS430499E - Capstone Project 2",
-        "INTE430497E - Internship"
+        "Capstone Project 2",
+        "Internship"
+    };
+
+    m_semesters = {
+        // Sem 1
+        1,1,1,1,1,1,1,
+        // Sem 2
+        2,2,2,2,2,2,2,2,
+        // Sem 3
+        3,3,3,3,3,3,3,3,
+        // Sem 4
+        4,4,4,4,4,4,4,
+        // Sem 5
+        5,5,5,5,5,5,5,
+        // Sem 6
+        6,6,6,6,6,6,
+        // Sem 7
+        7,7,7,7,
+        // Sem 8
+        8,8
     };
 
     m_adj.resize(m_courses.size());
@@ -90,32 +109,32 @@ void CourseGraph::buildSampleGraph() {
 
     // === Prerequisites (examples) ===
     // Math
-    addEdge("MATH132401E - Calculus 1", "MATH132501E - Calculus 2");
-    addEdge("MATH132501E - Calculus 2", "MATH143001E - Linear Algebra and Algebraic Structure");
+    addEdge("Calculus 1", "Calculus 2");
+    addEdge("Calculus 2", "Linear Algebra and Algebraic Structure");
 
     // Programming Core
-    addEdge("INPR130285E - Introduction to Programming", "PRTE230385E - Programming Techniques");
-    addEdge("PRTE230385E - Programming Techniques", "DASA230179E - Data Structure and Algorithm");
-    addEdge("DASA230179E - Data Structure and Algorithm", "OOPR230279E - Object-Oriented Programming");
+    addEdge("Introduction to Programming", "Programming Techniques");
+    addEdge("Programming Techniques", "Data Structure and Algorithm");
+    addEdge("Data Structure and Algorithm", "Object-Oriented Programming");
 
     // Database
-    addEdge("OOPR230279E - Object-Oriented Programming", "DBSY230184E - Database Systems");
+    addEdge("Object-Oriented Programming", "Database Systems");
 
     // Networking
-    addEdge("INTE230187E - Computer Networks", "PRNE230282E - Computer Networking Practice");
+    addEdge("Computer Networks", "Computer Networking Practice");
 
     // Software Engineering
-    addEdge("OOPR230279E - Object-Oriented Programming", "SOEN230289E - Software Engineering");
-    addEdge("SOEN230289E - Software Engineering", "SYDE230281E - Systems Analysis and Design");
+    addEdge("Object-Oriented Programming", "Software Engineering");
+    addEdge("Software Engineering", "Systems Analysis and Design");
 
     // AI / ML
-    addEdge("PRCO230383E - Probability & Statistics", "MALE230291E - Machine Learning");
-    addEdge("MALE230291E - Machine Learning", "NEDE230298E - Neural Networks & Deep Learning");
+    addEdge("Probability & Statistics", "Machine Learning");
+    addEdge("Machine Learning", "Neural Networks & Deep Learning");
 
     // Capstone & Internship
-    addEdge("SYDE230281E - Systems Analysis and Design", "CAPS330399E - Capstone Project 1");
-    addEdge("CAPS330399E - Capstone Project 1", "CAPS430499E - Capstone Project 2");
-    addEdge("CAPS430499E - Capstone Project 2", "INTE430497E - Internship");
+    addEdge("Systems Analysis and Design", "Capstone Project 1");
+    addEdge("Capstone Project 1", "Capstone Project 2");
+    addEdge("Capstone Project 2", "Internship");
 }
 
 QStringList CourseGraph::topoSort() {
@@ -173,19 +192,26 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
         return result;
     }
 
-    // 2. Bỏ các môn trong danh sách completedCourses (sinh viên tick đã học)
+    // 2. Bỏ các môn trong danh sách completedCourses (sinh viên tick chọn)
     for (const QString &done : completedCourses) {
         order.removeAll(done);
     }
 
-    // 3. Tính số kỳ còn lại
+    // 3. Bỏ tất cả môn thuộc các kỳ đã hoàn thành (1 → completedSemesters)
+    for (int i = 0; i < m_courses.size(); i++) {
+        if (m_semesters[i] <= completedSemesters) {
+            order.removeAll(m_courses[i]);
+        }
+    }
+
+    // 4. Tính số kỳ còn lại
     int remainSemesters = targetSemesters - completedSemesters;
     if (remainSemesters <= 0) {
         emit errorOccurred("Target semesters must be greater than completed semesters.");
         return result;
     }
 
-    // 4. Chia đều danh sách còn lại
+    // 5. Chia đều danh sách còn lại vào các kỳ
     int perSemester = qCeil((double)order.size() / remainSemesters);
     int idx = 0;
     for (int s = completedSemesters + 1; s <= targetSemesters; ++s) {
@@ -195,7 +221,6 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
         }
 
         if (!semCourses.isEmpty()) {
-            // Đưa vào QVariantMap để QML đọc được
             QVariantMap sem;
             sem["semester"] = s;
             sem["courses"] = semCourses;
@@ -205,8 +230,6 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
 
     return result;
 }
-
-
 
 QString CourseGraph::dotFromCourses(const QStringList &courses) const {
     QString dot = "digraph G { rankdir=LR; node [shape=round];\n";
@@ -236,4 +259,17 @@ QString CourseGraph::svgBase64FromDot(const QString &dot) const {
 QString CourseGraph::svgForPlan(const QStringList &courses) {
     QString dot = dotFromCourses(courses);
     return svgBase64FromDot(dot);
+}
+
+QVariantList CourseGraph::searchCourse(const QString &keyword) {
+    QVariantList result;
+    for (int i = 0; i < m_courses.size(); i++) {
+        if (m_courses[i].contains(keyword, Qt::CaseInsensitive)) {
+            QVariantMap item;
+            item["name"] = m_courses[i];
+            item["semester"] = m_semesters[i];
+            result << item;
+        }
+    }
+    return result;
 }

@@ -17,6 +17,8 @@ public:
 
     Q_INVOKABLE QString svgForPlan(const QStringList &remainingCourses);
     Q_INVOKABLE QStringList topoSort();
+    Q_INVOKABLE QVariantList searchCourse(const QString &keyword);
+
 signals:
     void errorOccurred(const QString &msg);
 
@@ -26,5 +28,6 @@ private:
     QString dotFromCourses(const QStringList &courses) const;
 
     QVector<QString> m_courses;
+    QVector<int> m_semesters;
     QVector<QVector<int>> m_adj; // adjacency list
 };
