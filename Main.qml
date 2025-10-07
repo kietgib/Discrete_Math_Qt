@@ -65,7 +65,7 @@ ApplicationWindow {
                 Row {
                     spacing: 10
                     Label { text: "Target Semesters:"; color: "white" }
-                    SpinBox { from: 7; to: 16; value: 8; onValueChanged: targetSemesters = value }
+                    SpinBox { from: 8; to: 16; value: 8; onValueChanged: targetSemesters = value }
                 }
 
                 // --- Search ---
@@ -221,9 +221,7 @@ ApplicationWindow {
                             smooth: true
                             fillMode: Image.PreserveAspectFit
                             transformOrigin: Item.TopLeft
-                            scale: 1.0
-                            width: parent.width - 20
-                            height: parent.height - 20
+                            scale: 1
                         }
                     }
                 }

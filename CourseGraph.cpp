@@ -177,8 +177,18 @@ QStringList CourseGraph::topoSort() {
 
     return result;
 }
-
-
+QVariantList CourseGraph::searchCourse(const QString &keyword) {
+    QVariantList result;
+    for (int i = 0; i < m_courses.size(); i++) {
+        if (m_courses[i].contains(keyword, Qt::CaseInsensitive)) {
+            QVariantMap item;
+            item["name"] = m_courses[i];
+            item["semester"] = m_semesters[i];
+            result << item;
+        }
+    }
+    return result;
+}
 QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
                                             int targetSemesters,
                                             const QList<QString> &completedCourses)
@@ -231,8 +241,12 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
     return result;
 }
 
+// Xu li do thi
 QString CourseGraph::dotFromCourses(const QStringList &courses) const {
-    QString dot = "digraph G { rankdir=LR; node [shape=round];\n";
+    QString dot = "digraph prereq {\n"
+                  "rankdir=LR;\n"
+                  "node [shape=box, style=rounded, fontsize=10, margin=\"0.6,0.4\", width=0, height=0, fixedsize=false];\n"
+                  "edge [arrowsize=0.7];\n";
     for (int u = 0; u < m_courses.size(); ++u) {
         if (!courses.contains(m_courses[u])) continue;
         dot += "\"" + m_courses[u] + "\";\n";
@@ -261,15 +275,4 @@ QString CourseGraph::svgForPlan(const QStringList &courses) {
     return svgBase64FromDot(dot);
 }
 
-QVariantList CourseGraph::searchCourse(const QString &keyword) {
-    QVariantList result;
-    for (int i = 0; i < m_courses.size(); i++) {
-        if (m_courses[i].contains(keyword, Qt::CaseInsensitive)) {
-            QVariantMap item;
-            item["name"] = m_courses[i];
-            item["semester"] = m_semesters[i];
-            result << item;
-        }
-    }
-    return result;
-}
+
