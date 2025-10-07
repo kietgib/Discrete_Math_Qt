@@ -191,55 +191,96 @@ QVariantList CourseGraph::searchCourse(const QString &keyword) {
 }
 QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
                                             int targetSemesters,
-                                            const QList<QString> &completedCourses)
+                                            const QStringList &completedCourses)
 {
     QVariantList result;
 
-    // 1. Topological sort
+    // 1. Topological sort toàn bộ
     QStringList order = topoSort();
     if (order.isEmpty()) {
         emit errorOccurred("Topological sort failed (maybe cycle in graph).");
         return result;
     }
 
-    // 2. Bỏ các môn trong danh sách completedCourses (sinh viên tick chọn)
-    for (const QString &done : completedCourses) {
-        order.removeAll(done);
-    }
-
-    // 3. Bỏ tất cả môn thuộc các kỳ đã hoàn thành (1 → completedSemesters)
+    // 2. Xóa tất cả môn thuộc các kỳ đã hoàn thành
     for (int i = 0; i < m_courses.size(); i++) {
         if (m_semesters[i] <= completedSemesters) {
             order.removeAll(m_courses[i]);
         }
     }
 
-    // 4. Tính số kỳ còn lại
-    int remainSemesters = targetSemesters - completedSemesters;
-    if (remainSemesters <= 0) {
-        emit errorOccurred("Target semesters must be greater than completed semesters.");
+    // 3. Thêm lại các môn đã tick (nếu còn trong graph)
+    QStringList mergedCourses = order;
+    for (const QString &c : completedCourses) {
+        if (!mergedCourses.contains(c) && m_courses.contains(c)) {
+            mergedCourses << c;
+        }
+    }
+
+    // 4. Chạy lại topoSort nhưng chỉ giữ các môn trong mergedCourses
+    QStringList sorted;
+    QSet<QString> keepSet = QSet<QString>(mergedCourses.begin(), mergedCourses.end());
+
+    // copy lại graph để lọc
+    int n = m_courses.size();
+    QVector<int> indeg(n, 0);
+    for (int u = 0; u < n; ++u) {
+        for (int v : m_adj[u]) {
+            if (keepSet.contains(m_courses[u]) && keepSet.contains(m_courses[v]))
+                indeg[v]++;
+        }
+    }
+
+    QList<int> q;
+    for (int i = 0; i < n; ++i) {
+        if (keepSet.contains(m_courses[i]) && indeg[i] == 0)
+            q.append(i);
+    }
+
+    while (!q.isEmpty()) {
+        int u = q.takeFirst();
+        if (!keepSet.contains(m_courses[u])) continue;
+        sorted << m_courses[u];
+        for (int v : m_adj[u]) {
+            if (keepSet.contains(m_courses[v])) {
+                indeg[v]--;
+                if (indeg[v] == 0)
+                    q.append(v);
+            }
+        }
+    }
+
+    if (sorted.size() != mergedCourses.size()) {
+        emit errorOccurred("Some selected courses cannot be scheduled (cycle or missing prereq).");
         return result;
     }
 
-    // 5. Chia đều danh sách còn lại vào các kỳ
-    int perSemester = qCeil((double)order.size() / remainSemesters);
+    // 5. Chia đều sorted vào các kỳ còn lại
+    int remainSemesters = targetSemesters - completedSemesters;
+    if (remainSemesters <= 0) return result;
+    int total = sorted.size();
+    int base = total / remainSemesters;   // số môn tối thiểu mỗi kỳ
+    int extra = total % remainSemesters;  // số kỳ đầu được +1 môn
     int idx = 0;
-    for (int s = completedSemesters + 1; s <= targetSemesters; ++s) {
+    for (int i = 0; i < remainSemesters; ++i) {
+        int semNo = completedSemesters + i + 1;
+        int count = base + (i < extra ? 1 : 0);  // chia đều và dàn phần dư
         QStringList semCourses;
-        for (int j = 0; j < perSemester && idx < order.size(); ++j, ++idx) {
-            semCourses << order[idx];
+
+        for (int j = 0; j < count && idx < total; ++j, ++idx) {
+            semCourses << sorted[idx];
         }
 
-        if (!semCourses.isEmpty()) {
-            QVariantMap sem;
-            sem["semester"] = s;
-            sem["courses"] = semCourses;
-            result << sem;
-        }
+        QVariantMap sem;
+        sem["semester"] = semNo;
+        sem["courses"] = semCourses;
+        result << sem;
     }
+
 
     return result;
 }
+
 
 // Xu li do thi
 QString CourseGraph::dotFromCourses(const QStringList &courses) const {

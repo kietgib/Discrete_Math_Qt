@@ -7,7 +7,7 @@ ApplicationWindow {
     width: Screen.width
     height: Screen.height
     color: "#25558e"
-    title: "Course Graph Viewer by QT"
+    title: "Study Planner"
 
     CourseGraph {
         id: graph
@@ -27,22 +27,28 @@ ApplicationWindow {
         padding: 20
 
         // --- Logo + tiêu đề ---
-        Row {
-            spacing: 12
-            height: 80
+        Rectangle {
+               width: parent.width / 2      // 🔸 Chỉ chiếm 1 nửa ngang
+               height: 80
+               color: "transparent"         // Không cần nền
 
-            Image {
-                source: "qrc:/qml/logo.png"
-                width: 75; height: 75
-                fillMode: Image.PreserveAspectFit
-            }
+                Row {
+                    anchors.fill: parent
+                    spacing: 12
 
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                Text { text: "Ho Chi Minh City University of Technology and Education"; font.pointSize: 8; font.bold: true; color: "#D3D3D3" }
-                Text { text: "Faculty of International Education"; font.pointSize: 8; font.bold: true; color: "#D3D3D3" }
+                    Image {
+                        source: "qrc:/qml/logo.png"
+                        width: 75; height: 75
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        Text { text: "Ho Chi Minh City University of Technology and Education"; font.pointSize: 8; font.bold: true; color: "#D3D3D3" }
+                        Text { text: "Faculty of International Education"; font.pointSize: 8; font.bold: true; color: "#D3D3D3" }
+                    }
+                }
             }
-        }
 
         Row {
             spacing: 50
@@ -51,28 +57,44 @@ ApplicationWindow {
             // --- Cột trái ---
             Column {
                 width: parent.width * 0.25
-                spacing: 8
+
 
                 Text { text: "COURSE PLANNING"; font.pointSize: 26; font.bold: true; color:"#FFFFFF" }
                 Text { text: "Program: Information Technology"; font.pointSize: 14; font.bold: true; color:"#FFFFFF" }
 
+                Row {
+                spacing: 3
+                Text { text: "Trần Gia Kiệt - 24110103"; font.pointSize: 9;  color:"#FFFFFF" ; font.italic: true}
+                }
+                Row
+                {
+                spacing: 3
+                Text { text: "Mai Viết Thành - 24110129"; font.pointSize: 9;  color:"#FFFFFF" ; font.italic: true}
+                }
+                Row
+                {
+                spacing: 3
+                Text { text: "Nguyễn Huỳnh Minh Tuyết - 24110144"; font.pointSize: 9;  color:"#FFFFFF" ; font.italic: true; lineHeight: 4}
+                }
+
+                spacing: 8
                 // Completed / Target Semester
                 Row {
                     spacing: 10
-                    Label { text: "Completed Semesters:"; color: "white" }
+                    Label { text: "Completed Semesters:"; font.bold: true; color: "white" }
                     SpinBox { from: 0; to: 6; value: 0; onValueChanged: completedSemesters = value }
                 }
                 Row {
                     spacing: 10
-                    Label { text: "Target Semesters:"; color: "white" }
-                    SpinBox { from: 8; to: 16; value: 8; onValueChanged: targetSemesters = value }
+                    Label { text: "Target Semesters:"; font.bold: true; color: "white" }
+                    SpinBox { from: 7; to: 16; value: 8; onValueChanged: targetSemesters = value }
                 }
 
                 // --- Search ---
                 TextField {
                     id: searchField
-                    placeholderText: "Tìm môn học..."
-                    width: parent.width
+                    placeholderText: "Finding subjects..."
+                    width: parent.width * 0.75
                     onTextChanged: {
                         searchModel.clear()
                         if (text.length > 0) {
@@ -94,9 +116,11 @@ ApplicationWindow {
 
                     delegate: Row {
                         spacing: 8
+
                         CheckBox {
                             id: chk
-                            text: model.name
+                            checked: completedCourses.indexOf(model.name) !== -1
+                            // Không dùng text ở đây nữa để tránh bị đè
                             onCheckedChanged: {
                                 if (checked) {
                                     if (completedCourses.indexOf(model.name) === -1)
@@ -107,12 +131,26 @@ ApplicationWindow {
                                 }
                             }
                         }
-                        Text { text: "(Kỳ " + model.semester + ")"; color: "white"; font.pointSize: 10 }
+
+                        Text {
+                            text: model.name       // 🔸 Tên môn học
+                            color: "white"         // 🔸 Màu đen
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        Text {
+                            text: "(semester " + model.semester + ")"
+                            font.bold: true
+                            color: "white"         // 🔸 Màu trắng cho phần semester
+                            font.pointSize: 10
+                            verticalAlignment: Text.AlignVCenter
+                        }
                     }
                 }
 
+
                 // --- Danh sách môn đã tick ---
-                Text { text: "Danh sách đã chọn:"; color: "yellow"; font.bold: true }
+                Text { text: "CHOSEN SUBJECTS:"; color: "yellow"; font.bold: true; font.pointSize:11 ; lineHeight: 1}
                 ListView {
                     width: parent.width
                     height: 100
@@ -122,7 +160,7 @@ ApplicationWindow {
 
                 // --- Buttons ---
                 Row {
-                    spacing: 8
+                    spacing: 15
                     Button {
                         text: "Generate Plan"
                         onClicked: {
@@ -132,18 +170,23 @@ ApplicationWindow {
                             for (var i=0; i<plan.length; i++) {
                                 var sem = plan[i]
                                 var semCourses = sem.courses
-                                outputModel.append({ semester: "Semester " + sem.semester, courses: semCourses.join(", ") })
+                                outputModel.append({
+                                    semester: "Semester " + sem.semester,
+                                    courses: semCourses.join(", ")
+                                })
                                 for (var j=0; j<semCourses.length; j++)
                                     remaining.push(semCourses[j])
                             }
                             svgImage.source = graph.svgForPlan(remaining)
 
+                            // 🔹 Danh sách các môn tick vẫn hiển thị bên trái
                             completedModel.clear()
                             for (var k=0; k<completedCourses.length; k++) {
                                 completedModel.append({ name: completedCourses[k] })
                             }
                         }
                     }
+
                     Button {
                         text: "Clear All"
                         onClicked: {
@@ -160,74 +203,90 @@ ApplicationWindow {
 
             // --- Cột phải ---
             Rectangle {
-                width: parent.width * 0.7
+                id: whiteBoardContainer
+                width: parent.width * 0.68
                 height: 650
-                color: "#ffffff"
-                border.color: "#cccccc"
-                radius: 8
 
-                Column {
+
+                // Bảng trắng chính
+                Rectangle {
+                    id: whiteBoard
                     anchors.fill: parent
-                    spacing: 10
-                    padding: 10
+                    color: "#F0F0F0"
+                    border.color: "#cccccc"
+                    radius: 15
 
-                    // Nửa trên: Output result
-                    ListView {
-                        width: parent.width
-                        height: parent.height * 0.4
-                        model: ListModel { id: outputModel }
-                        clip: true
-                        spacing: 6
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 20             // 🔸 Khoảng hở đều bên trong
+                        spacing: 15
 
-                        delegate: Column {
-                            width: ListView.view.width
-                            spacing: 2
+                        // --- Nửa trên: Output result ---
+                        ListView {
+                            width: parent.width
+                            height: parent.height * 0.4
+                            model: ListModel { id: outputModel }
+                            clip: true
+                            spacing: 3
 
-                            Text {
-                                text: semester
-                                font.bold: true
-                                font.pointSize: 12
-                                color: "#000000"
-                                horizontalAlignment: Text.AlignLeft
+                            delegate: Column {
+                                width: ListView.view.width
+                                spacing: 2
+
+                                Text {
+                                    text: semester
+                                    font.bold: true
+                                    font.pointSize: 12
+                                    color: "#000000"
+                                    horizontalAlignment: Text.AlignLeft
+                                }
+
+                                Text {
+                                    text: courses
+                                    font.pointSize: 11
+                                    color: "#333333"
+                                    wrapMode: Text.Wrap
+                                    width: parent.width - 20
+                                    horizontalAlignment: Text.AlignLeft
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 20
+                                    clip: true
+                                }
                             }
+                        }
 
-                            Text {
-                                text: courses
-                                font.pointSize: 11
-                                color: "#333333"
-                                wrapMode: Text.Wrap   // Cho xuống dòng
-                                width: parent.width - 20
-                                horizontalAlignment: Text.AlignLeft
-                                anchors.left: parent.left
-                                anchors.leftMargin: 20
+                        // --- Nửa dưới: Graph ---
+                        Rectangle {
+                            id: graphBoard
+                            width: parent.width
+                            height: parent.height * 0.6
+                            color: "#ffffff"        // 🔸 Màu nền mới cho bảng dưới
+                            radius: 10
+
+                            Flickable {
+                                anchors.fill: parent
+                                contentWidth: svgImage.width * svgImage.scale
+                                contentHeight: svgImage.height * svgImage.scale
                                 clip: true
+
+                                Image {
+                                    id: svgImage
+                                    anchors.centerIn: parent
+                                    source: ""
+                                    asynchronous: true
+                                    smooth: true
+                                    fillMode: Image.PreserveAspectFit
+                                    transformOrigin: Item.TopLeft
+                                    scale: 1
+                                }
                             }
                         }
-                    }
 
-                    // Nửa dưới: Graph
-                    Flickable {
-                        width: parent.width
-                        height: parent.height * 0.55
-                        contentWidth: svgImage.width * svgImage.scale
-                        contentHeight: svgImage.height * svgImage.scale
-                        clip: true
-
-                        Image {
-                            id: svgImage
-                            anchors.centerIn: parent
-                            source: ""
-                            asynchronous: true
-                            smooth: true
-                            fillMode: Image.PreserveAspectFit
-                            transformOrigin: Item.TopLeft
-                            scale: 1
-                        }
                     }
                 }
             }
         }
-    }
+
 
     // Error dialog
     Dialog {
@@ -245,4 +304,5 @@ ApplicationWindow {
         }
         property alias text: dialogText.text
     }
+}
 }
