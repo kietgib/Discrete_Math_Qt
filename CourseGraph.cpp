@@ -107,10 +107,27 @@ void CourseGraph::buildSampleGraph() {
         }
     };
 
-    // === Prerequisites (examples) ===
+    // Prerequisites
     // Math
     addEdge("Calculus 1", "Calculus 2");
+    addEdge("Calculus 2", "Discrete Mathematics & Graphs Theory");
     addEdge("Calculus 2", "Linear Algebra and Algebraic Structure");
+
+    // Politics
+    addEdge("Philosophy of Marxism-Leninism","Political Economics of Marxism-Leninism");
+    addEdge("Philosophy of Marxism-Leninism","Scientific Socialism");
+    addEdge("Philosophy of Marxism-Leninism","Ho Chi Minh Ideology");
+    addEdge("Political Economics of Marxism-Leninism","History of Vietnamese Communist Party");
+
+    // Academic English
+    addEdge("Academic English 1", "Academic English 3");
+    addEdge("Academic English 2","Academic English 4");
+
+    // Physics
+    addEdge("Physical Education 1","Physical Education 2");
+    addEdge("Physical Education 2","Physical Education 3");
+    addEdge("Physical Education 1","Physics 1 Lab");
+    addEdge("Physical Education 3","Physical Education 4");
 
     // Programming Core
     addEdge("Introduction to Programming", "Programming Techniques");
@@ -249,15 +266,8 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
             }
         }
     }
-
-    if (sorted.size() != mergedCourses.size()) {
-        emit errorOccurred("Some selected courses cannot be scheduled (cycle or missing prereq).");
-        return result;
-    }
-
     // 5. Chia đều sorted vào các kỳ còn lại
     int remainSemesters = targetSemesters - completedSemesters;
-    if (remainSemesters <= 0) return result;
     int total = sorted.size();
     int base = total / remainSemesters;   // số môn tối thiểu mỗi kỳ
     int extra = total % remainSemesters;  // số kỳ đầu được +1 môn
@@ -315,5 +325,3 @@ QString CourseGraph::svgForPlan(const QStringList &courses) {
     QString dot = dotFromCourses(courses);
     return svgBase64FromDot(dot);
 }
-
-

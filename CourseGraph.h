@@ -10,7 +10,9 @@ class CourseGraph : public QObject {
 public:
     explicit CourseGraph(QObject *parent = nullptr);
 
-    Q_INVOKABLE QVariantList generateStudyPlan(int completedSemesters,int targetSemesters,const QList<QString> &completedCourses);
+    Q_INVOKABLE QVariantList generateStudyPlan(int completedSemesters,
+                                               int targetSemesters,
+                                               const QList<QString> &completedCourses);
     Q_INVOKABLE QString svgForPlan(const QStringList &remainingCourses);
     Q_INVOKABLE QStringList topoSort();
     Q_INVOKABLE QVariantList searchCourse(const QString &keyword);

@@ -7,7 +7,7 @@ ApplicationWindow {
     width: Screen.width
     height: Screen.height
     color: "#25558e"
-    title: "Study Planner"
+    title: "Study Planner by Qt Creator"
 
     CourseGraph {
         id: graph
@@ -26,11 +26,11 @@ ApplicationWindow {
         spacing: 8
         padding: 20
 
-        // --- Logo + tiêu đề ---
+        // Logo + tiêu đề
         Rectangle {
-               width: parent.width / 2      // 🔸 Chỉ chiếm 1 nửa ngang
+               width: parent.width / 2
                height: 80
-               color: "transparent"         // Không cần nền
+               color: "transparent"
 
                 Row {
                     anchors.fill: parent
@@ -54,7 +54,7 @@ ApplicationWindow {
             spacing: 50
             width: parent.width
 
-            // --- Cột trái ---
+            // Cột trái
             Column {
                 width: parent.width * 0.25
 
@@ -78,7 +78,8 @@ ApplicationWindow {
                 }
 
                 spacing: 8
-                // Completed / Target Semester
+
+                // Chọn yêu cầu sinh viên
                 Row {
                     spacing: 10
                     Label { text: "Completed Semesters:"; font.bold: true; color: "white" }
@@ -90,7 +91,7 @@ ApplicationWindow {
                     SpinBox { from: 7; to: 16; value: 8; onValueChanged: targetSemesters = value }
                 }
 
-                // --- Search ---
+                // Search
                 TextField {
                     id: searchField
                     placeholderText: "Finding subjects..."
@@ -106,7 +107,7 @@ ApplicationWindow {
                     }
                 }
 
-                // --- List kết quả tìm kiếm ---
+                // listsearch
                 ListView {
                     id: searchResults
                     width: parent.width
@@ -133,23 +134,22 @@ ApplicationWindow {
                         }
 
                         Text {
-                            text: model.name       // 🔸 Tên môn học
-                            color: "white"         // 🔸 Màu đen
+                            text: model.name       // Tên môn học
+                            color: "white"         // Màu đen
                             verticalAlignment: Text.AlignVCenter
                         }
 
                         Text {
                             text: "(semester " + model.semester + ")"
                             font.bold: true
-                            color: "white"         // 🔸 Màu trắng cho phần semester
+                            color: "white"         // Màu trắng cho phần semester
                             font.pointSize: 10
                             verticalAlignment: Text.AlignVCenter
                         }
                     }
                 }
 
-
-                // --- Danh sách môn đã tick ---
+                // Phần tick môn
                 Text { text: "CHOSEN SUBJECTS:"; color: "yellow"; font.bold: true; font.pointSize:11 ; lineHeight: 1}
                 ListView {
                     width: parent.width
@@ -158,7 +158,7 @@ ApplicationWindow {
                     delegate: Text { text: model.name; color: "white"; font.pointSize: 10 }
                 }
 
-                // --- Buttons ---
+                // Cấu trúc nút tạo đường dẫn và đồ thị
                 Row {
                     spacing: 15
                     Button {
@@ -178,8 +178,6 @@ ApplicationWindow {
                                     remaining.push(semCourses[j])
                             }
                             svgImage.source = graph.svgForPlan(remaining)
-
-                            // 🔹 Danh sách các môn tick vẫn hiển thị bên trái
                             completedModel.clear()
                             for (var k=0; k<completedCourses.length; k++) {
                                 completedModel.append({ name: completedCourses[k] })
@@ -201,7 +199,7 @@ ApplicationWindow {
                 }
             }
 
-            // --- Cột phải ---
+            // Cột phải
             Rectangle {
                 id: whiteBoardContainer
                 width: parent.width * 0.68
@@ -218,10 +216,10 @@ ApplicationWindow {
 
                     Column {
                         anchors.fill: parent
-                        anchors.margins: 20             // 🔸 Khoảng hở đều bên trong
+                        anchors.margins: 20             // Khoảng hở đều bên trong
                         spacing: 15
 
-                        // --- Nửa trên: Output result ---
+                        // Nửa trên: Output result
                         ListView {
                             width: parent.width
                             height: parent.height * 0.4
@@ -255,12 +253,12 @@ ApplicationWindow {
                             }
                         }
 
-                        // --- Nửa dưới: Graph ---
+                        // Nửa dưới: Graph
                         Rectangle {
                             id: graphBoard
                             width: parent.width
                             height: parent.height * 0.6
-                            color: "#ffffff"        // 🔸 Màu nền mới cho bảng dưới
+                            color: "#ffffff"        // Màu nền mới cho bảng dưới
                             radius: 10
 
                             Flickable {
