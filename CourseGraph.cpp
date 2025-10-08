@@ -37,7 +37,6 @@ void CourseGraph::buildSampleGraph() {
         "Database Systems",
         "Physics 1 Lab",
         "Physical Education 3",
-
         // Semester 4
         "Ho Chi Minh Ideology",
         "Operating Systems",
@@ -188,7 +187,7 @@ QStringList CourseGraph::topoSort() {
 
     // 4. Kiểm tra có chu trình không
     if (result.size() != n) {
-        emit errorOccurred("Graph has a cycle! Cannot do topological sort.");
+        emit errorOccurred("Cannot sorting");
         return {};
     }
 
@@ -206,16 +205,14 @@ QVariantList CourseGraph::searchCourse(const QString &keyword) {
     }
     return result;
 }
-QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
-                                            int targetSemesters,
-                                            const QStringList &completedCourses)
+QVariantList CourseGraph::generateStudyPlan(int completedSemesters,int targetSemesters,const QStringList &completedCourses)
 {
     QVariantList result;
 
     // 1. Topological sort toàn bộ
     QStringList order = topoSort();
     if (order.isEmpty()) {
-        emit errorOccurred("Topological sort failed (maybe cycle in graph).");
+        emit errorOccurred("Cannot sorting");
         return result;
     }
 
@@ -226,7 +223,7 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
         }
     }
 
-    // 3. Thêm lại các môn đã tick (nếu còn trong graph)
+    // 3. Thêm lại các môn đã tick
     QStringList mergedCourses = order;
     for (const QString &c : completedCourses) {
         if (!mergedCourses.contains(c) && m_courses.contains(c)) {
@@ -234,7 +231,7 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
         }
     }
 
-    // 4. Chạy lại topoSort nhưng chỉ giữ các môn trong mergedCourses
+    // 4. Chạy lại topoSort
     QStringList sorted;
     QSet<QString> keepSet = QSet<QString>(mergedCourses.begin(), mergedCourses.end());
 
@@ -270,11 +267,11 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
     int remainSemesters = targetSemesters - completedSemesters;
     int total = sorted.size();
     int base = total / remainSemesters;   // số môn tối thiểu mỗi kỳ
-    int extra = total % remainSemesters;  // số kỳ đầu được +1 môn
+    int extra = total % remainSemesters;
     int idx = 0;
     for (int i = 0; i < remainSemesters; ++i) {
         int semNo = completedSemesters + i + 1;
-        int count = base + (i < extra ? 1 : 0);  // chia đều và dàn phần dư
+        int count = base + (i < extra ? 1 : 0);
         QStringList semCourses;
 
         for (int j = 0; j < count && idx < total; ++j, ++idx) {
@@ -296,7 +293,7 @@ QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
 QString CourseGraph::dotFromCourses(const QStringList &courses) const {
     QString dot = "digraph prereq {\n"
                   "rankdir=LR;\n"
-                  "node [shape=box, style=rounded, fontsize=10, margin=\"0.6,0.4\", width=0, height=0, fixedsize=false];\n"
+                  "node [shape=box, style=rounded, fontsize=10, margin=\"0.2,0.1\", width=0, height=0, fixedsize=false];\n"
                   "edge [arrowsize=0.7];\n";
     for (int u = 0; u < m_courses.size(); ++u) {
         if (!courses.contains(m_courses[u])) continue;
