@@ -17,7 +17,7 @@ ApplicationWindow {
         }
     }
 
-    property var completedCourses: []
+    property var completedCourses: []   // Goi them mang de xuong cho UI
     property int completedSemesters: 0
     property int targetSemesters: 8
 
@@ -54,7 +54,7 @@ ApplicationWindow {
             spacing: 50
             width: parent.width
 
-            // Cột trái
+            // Column trai
             Column {
                 width: parent.width * 0.25
 
@@ -79,7 +79,7 @@ ApplicationWindow {
 
                 spacing: 8
 
-                // Chọn yêu cầu sinh viên
+                // Yeu cau cua sv
                 Row {
                     spacing: 10
                     Label { text: "Completed Semesters:"; font.bold: true; color: "white" }
@@ -134,15 +134,15 @@ ApplicationWindow {
                         }
 
                         Text {
-                            text: model.name       // Tên môn học
-                            color: "white"         // Màu đen
+                            text: model.name
+                            color: "white"
                             verticalAlignment: Text.AlignVCenter
                         }
 
                         Text {
                             text: "(semester " + model.semester + ")"
                             font.bold: true
-                            color: "white"         // Màu trắng cho phần semester
+                            color: "white"
                             font.pointSize: 10
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -158,7 +158,7 @@ ApplicationWindow {
                     delegate: Text { text: model.name; color: "white"; font.pointSize: 10 }
                 }
 
-                // Cấu trúc nút tạo đường dẫn và đồ thị
+                // Nut tao do thi
                 Row {
                     spacing: 15
                     Button {
@@ -199,7 +199,7 @@ ApplicationWindow {
                 }
             }
 
-            // Cột phải
+            // phan phai
             Rectangle {
                 id: whiteBoardContainer
                 width: parent.width * 0.68
@@ -216,10 +216,10 @@ ApplicationWindow {
 
                     Column {
                         anchors.fill: parent
-                        anchors.margins: 20             // Khoảng hở đều bên trong
+                        anchors.margins: 20
                         spacing: 15
 
-                        // Nửa trên: Output result
+                        // Output kq
                         ListView {
                             width: parent.width
                             height: parent.height * 0.4
@@ -253,12 +253,12 @@ ApplicationWindow {
                             }
                         }
 
-                        // Nửa dưới: Graph
+                        // Graphic
                         Rectangle {
                             id: graphBoard
                             width: parent.width
                             height: parent.height * 0.6
-                            color: "#ffffff"        // Màu nền mới cho bảng dưới
+                            color: "#ffffff"
                             radius: 10
 
                             Flickable {
