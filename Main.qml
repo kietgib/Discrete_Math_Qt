@@ -16,7 +16,27 @@ ApplicationWindow {
             msgDialog.open()
         }
     }
-
+    // goi ham tu dong cap nhat sau moi lan thay doi lua chon
+    function updatePlan() {
+        var plan = graph.generateStudyPlan(completedSemesters, targetSemesters, completedCourses)
+        outputModel.clear()
+        var remaining = []
+        for (var i=0; i<plan.length; i++) {
+            var sem = plan[i]
+            var semCourses = sem.courses
+            outputModel.append({
+                semester: "Semester " + sem.semester,
+                courses: semCourses.join(", ")
+            })
+            for (var j=0; j<semCourses.length; j++)
+                remaining.push(semCourses[j])
+        }
+        svgImage.source = graph.svgForPlan(remaining)
+        completedModel.clear()
+        for (var k=0; k<completedCourses.length; k++) {
+            completedModel.append({ name: completedCourses[k] })
+        }
+    }
     property var completedCourses: []   // Goi them mang de xuong cho UI
     property int completedSemesters: 0
     property int targetSemesters: 8
@@ -83,12 +103,22 @@ ApplicationWindow {
                 Row {
                     spacing: 10
                     Label { text: "Completed Semesters:"; font.bold: true; color: "white" }
-                    SpinBox { from: 0; to: 6; value: 0; onValueChanged: completedSemesters = value }
+                    SpinBox { from: 0; to: 6; value: 0;
+                        onValueChanged: {
+                            completedSemesters = value
+                            updatePlan()
+                        }
+                    }
                 }
                 Row {
                     spacing: 10
                     Label { text: "Target Semesters:"; font.bold: true; color: "white" }
-                    SpinBox { from: 7; to: 16; value: 8; onValueChanged: targetSemesters = value }
+                    SpinBox { from: 7; to: 16; value: 8;
+                        onValueChanged: {
+                            targetSemesters = value
+                            updatePlan()
+                        }
+                    }
                 }
 
                 // Search
@@ -130,6 +160,7 @@ ApplicationWindow {
                                     var idx = completedCourses.indexOf(model.name)
                                     if (idx !== -1) completedCourses.splice(idx, 1)
                                 }
+                                updatePlan()
                             }
                         }
 

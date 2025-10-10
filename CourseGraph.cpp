@@ -167,7 +167,6 @@ void CourseGraph::buildSampleGraph() {
 
     // Security & AI branch
     addEdge("Principles of Information Security", "Network Security");
-    addEdge("Network Security", "Programming Paradigms");
 
     // ML support
     addEdge("Data Structure and Algorithm", "Information Retrieval");
