@@ -102,7 +102,6 @@ void CourseGraph::buildSampleGraph() {
     addEdge("Calculus 2", "Discrete Mathematics & Graphs Theory");
     addEdge("Calculus 2", "Linear Algebra and Algebraic Structure");
     addEdge("Discrete Mathematics & Graphs Theory", "Data Structure and Algorithm");
-    addEdge("Calculus 2","Philosophy of Marxism-Leninism");
 
     // Politics
     addEdge("Philosophy of Marxism-Leninism","Political Economics of Marxism-Leninism");
@@ -128,6 +127,7 @@ void CourseGraph::buildSampleGraph() {
     addEdge("Programming Techniques", "Object-Oriented Programming");
     addEdge("Data Structure and Algorithm", "Software Engineering");
     addEdge("Database Systems", "Software Engineering");
+    addEdge("Linear Algebra and Algebraic Structure","Database Systems");
 
     // Database & Software Eng
     addEdge("Object-Oriented Programming", "Database Systems");
