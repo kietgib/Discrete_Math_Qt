@@ -1,9 +1,7 @@
-#include "CourseGraph.h"
+#include "coursegraph.h"
 #include <QProcess>
+#include <QBuffer>
 #include <QDebug>
-#include <algorithm>
-#include <QLine>
-
 
 CourseGraph::CourseGraph(QObject *parent) : QObject(parent) {
     buildSampleGraph();
@@ -12,69 +10,69 @@ CourseGraph::CourseGraph(QObject *parent) : QObject(parent) {
 void CourseGraph::buildSampleGraph() {
     m_courses = {
         // Semester 1
-        "LLCT130105E - Philosophy of Marxism-Leninism",
-        "MATH132401E - Calculus 1",
-        "ACEN340535E - Academic English 1",
-        "ACEN340635E - Academic English 2",
-        "INIT130185E - Introduction to IT",
-        "INPR130285E - Introduction to Programming",
-        "PHED110130 - Physical Education 1",
+        "Philosophy of Marxism-Leninism",
+        "Calculus 1",
+        "Academic English 1",
+        "Academic English 2",
+        "Introduction to IT",
+        "Introduction to Programming",
+        "Physical Education 1",
 
         // Semester 2
-        "LLCT120205E - Political Economics of Marxism-Leninism",
-        "MATH132501E - Calculus 2",
-        "MATH143001E - Linear Algebra and Algebraic Structure",
-        "ACEN440735E - Academic English 3",
-        "ACEN440835E - Academic English 4",
-        "PRTE230385E - Programming Techniques",
-        "PHYS130902E - Physics 1",
-        "PHED110230 - Physical Education 2",
+        "Political Economics of Marxism-Leninism",
+        "Calculus 2",
+        "Linear Algebra and Algebraic Structure",
+        "Academic English 3",
+        "Academic English 4",
+        "Programming Techniques",
+        "Physics 1",
+        "Physical Education 2",
 
         // Semester 3
-        "LLCT120405E - Scientific Socialism",
-        "DIGR230485E - Discrete Mathematics & Graphs Theory",
-        "DASA230179E - Data Structure and Algorithm",
-        "OOPR230279E - Object-Oriented Programming",
-        "EEEN231780E - Basic Electronics (IT)",
-        "DBSY230184E - Database Systems",
-        "PHYS111202E - Physics 1 Lab",
-        "PHED110330 - Physical Education 3",
+        "Scientific Socialism",
+        "Discrete Mathematics & Graphs Theory",
+        "Data Structure and Algorithm",
+        "Object-Oriented Programming",
+        "Basic Electronics (IT)",
+        "Database Systems",
+        "Physics 1 Lab",
+        "Physical Education 3",
 
         // Semester 4
-        "LLCT120505E - Ho Chi Minh Ideology",
-        "OPSY230186E - Operating Systems",
-        "PRCO230383E - Probability & Statistics",
-        "SOEN230289E - Software Engineering",
-        "ARCH230189E - Computer Architecture",
-        "INTE230187E - Computer Networks",
-        "PHED110430 - Physical Education 4",
+        "Ho Chi Minh Ideology",
+        "Operating Systems",
+        "Probability & Statistics",
+        "Software Engineering",
+        "Computer Architecture",
+        "Computer Networks",
+        "Physical Education 4",
 
         // Semester 5
-        "LLCT120605E - History of Vietnamese Communist Party",
-        "SYDE230281E - Systems Analysis and Design",
-        "PRNE230282E - Computer Networking Practice",
-        "WEBP230286E - Web Programming",
-        "PRDA230284E - Principles of Data Analytics",
-        "MOPR230287E - Mobile Programming",
-        "PRSY230288E - Principles of Information Security",
+        "History of Vietnamese Communist Party",
+        "Systems Analysis and Design",
+        "Computer Networking Practice",
+        "Web Programming",
+        "Principles of Data Analytics",
+        "Mobile Programming",
+        "Principles of Information Security",
 
         // Semester 6
-        "INTR230290E - Information Retrieval",
-        "MALE230291E - Machine Learning",
-        "IMPR230292E - Image Processing",
-        "DIST230293E - Distributed Systems",
-        "HUPR230294E - Human-Computer Interaction",
-        "CLOD230295E - Cloud Computing",
+        "Information Retrieval",
+        "Machine Learning",
+        "Image Processing",
+        "Distributed Systems",
+        "Human-Computer Interaction",
+        "Cloud Computing",
 
         // Semester 7
-        "NEST230296E - Network Security",
-        "PRPR230297E - Programming Paradigms",
-        "NEDE230298E - Neural Networks & Deep Learning",
-        "CAPS330399E - Capstone Project 1",
+        "Network Security",
+        "Programming Paradigms",
+        "Neural Networks & Deep Learning",
+        "Capstone Project 1",
 
         // Semester 8
-        "CAPS430499E - Capstone Project 2",
-        "INTE430497E - Internship"
+        "Capstone Project 2",
+        "Internship"
     };
 
     m_semesters = {
@@ -95,262 +93,235 @@ void CourseGraph::buildSampleGraph() {
         // Sem 8
         8,8
     };
-    int n = m_courses.size();
-    m_adj.assign(n, QVector<int>());
 
-    auto addEdge = [&](int u, int v){
-        if (u>=0 && u<n && v>=0 && v<n)
-            m_adj[u].append(v);
+    m_adj.resize(m_courses.size());
+
+    // Helper: add edge by course names
+    auto addEdge = [&](const QString &u, const QString &v){
+        int iu = m_courses.indexOf(u);
+        int iv = m_courses.indexOf(v);
+        if (iu >= 0 && iv >= 0) {
+            m_adj[iu].append(iv);
+        } else {
+            qWarning() << "Invalid course edge:" << u << "->" << v;
+        }
     };
 
-    // Toán
-    addEdge(0, 5);   // MA101 -> MA102
-    addEdge(0, 10);  // MA101 -> MA201
-    addEdge(10, 15); // MA201 -> MA202
+    // Prerequisites
+    // Math
+    addEdge("Calculus 1", "Calculus 2");
+    addEdge("Calculus 2", "Discrete Mathematics & Graphs Theory");
+    addEdge("Calculus 2", "Linear Algebra and Algebraic Structure");
 
-    // CNTT cơ sở
-    addEdge(2, 7);   // IT101 -> IT102
-    addEdge(7, 11);  // IT102 -> IT201
-    addEdge(11, 17); // IT201 -> IT203
-    addEdge(17, 22); // IT203 -> IT303
-    addEdge(11, 18); // IT201 -> IT204
-    addEdge(12, 20); // IT202 -> IT301
+    // Politics
+    addEdge("Philosophy of Marxism-Leninism","Political Economics of Marxism-Leninism");
+    addEdge("Philosophy of Marxism-Leninism","Scientific Socialism");
+    addEdge("Philosophy of Marxism-Leninism","Ho Chi Minh Ideology");
+    addEdge("Political Economics of Marxism-Leninism","History of Vietnamese Communist Party");
 
-    // HTTT & Mạng
-    addEdge(18, 21); // IT204 -> IT302
-    addEdge(19, 25); // IT205 -> IT305
+    // Academic English
+    addEdge("Academic English 1", "Academic English 3");
+    addEdge("Academic English 2","Academic English 4");
 
-    // AI, ML, DL
-    addEdge(26, 30); // IT306 -> IT401
-    addEdge(27, 31); // IT308 -> IT402
-    addEdge(21, 32); // IT302 -> IT403
-    addEdge(20, 33); // IT301 -> IT404
-    addEdge(30, 34); // IT401 -> IT405
+    // Physics
+    addEdge("Physical Education 1","Physical Education 2");
+    addEdge("Physical Education 2","Physical Education 3");
+    addEdge("Physical Education 1","Physics 1 Lab");
+    addEdge("Physical Education 3","Physical Education 4");
 
-    // Đồ án & Thực tập (kỳ 8)
-    addEdge(32, 35); // IT403 -> IT406
-    addEdge(34, 35); // IT405 -> IT406
-    addEdge(35, 36); // IT406 -> IT407 (có thể yêu cầu xong đồ án mới đi thực tập, tuỳ chương trình)
+    // Programming Core
+    addEdge("Introduction to Programming", "Programming Techniques");
+    addEdge("Programming Techniques", "Data Structure and Algorithm");
+    addEdge("Data Structure and Algorithm", "Object-Oriented Programming");
 
+    // Database
+    addEdge("Object-Oriented Programming", "Database Systems");
 
-    m_dot = dotFromGraph();
-    emit coursesChanged();
+    // Networking
+    addEdge("Computer Networks", "Computer Networking Practice");
+
+    // Software Engineering
+    addEdge("Object-Oriented Programming", "Software Engineering");
+    addEdge("Software Engineering", "Systems Analysis and Design");
+
+    // AI / ML
+    addEdge("Probability & Statistics", "Machine Learning");
+    addEdge("Machine Learning", "Neural Networks & Deep Learning");
+
+    // Capstone & Internship
+    addEdge("Systems Analysis and Design", "Capstone Project 1");
+    addEdge("Capstone Project 1", "Capstone Project 2");
+    addEdge("Capstone Project 2", "Internship");
 }
 
-QStringList CourseGraph::coursesForSemester(int semester) const {
+QStringList CourseGraph::topoSort() {
     QStringList result;
-    for (int i = 0; i < m_courses.size(); ++i) {
-        if (i < m_semesters.size() && m_semesters[i] == semester) {
-            result << m_courses[i];
+
+    int n = m_courses.size();
+    QVector<int> indeg(n, 0);
+
+    // 1. Tính indegree
+    for (int u = 0; u < n; ++u) {
+        for (int v : m_adj[u]) {
+            indeg[v]++;
+        }
+    }
+
+    // 2. Queue cho các node indegree = 0
+    QList<int> q;
+    for (int i = 0; i < n; ++i) {
+        if (indeg[i] == 0)
+            q.append(i);
+    }
+
+    // 3. Kahn’s algorithm
+    while (!q.isEmpty()) {
+        int u = q.takeFirst();
+        result << m_courses[u];
+
+        for (int v : m_adj[u]) {
+            indeg[v]--;
+            if (indeg[v] == 0)
+                q.append(v);
+        }
+    }
+
+    // 4. Kiểm tra có chu trình không
+    if (result.size() != n) {
+        emit errorOccurred("Graph has a cycle! Cannot do topological sort.");
+        return {};
+    }
+
+    return result;
+}
+QVariantList CourseGraph::searchCourse(const QString &keyword) {
+    QVariantList result;
+    for (int i = 0; i < m_courses.size(); i++) {
+        if (m_courses[i].contains(keyword, Qt::CaseInsensitive)) {
+            QVariantMap item;
+            item["name"] = m_courses[i];
+            item["semester"] = m_semesters[i];
+            result << item;
         }
     }
     return result;
 }
+QVariantList CourseGraph::generateStudyPlan(int completedSemesters,
+                                            int targetSemesters,
+                                            const QStringList &completedCourses)
+{
+    QVariantList result;
 
-QVariantList CourseGraph::availableSemesters() const {
-    QSet<int> s(m_semesters.begin(), m_semesters.end());
-    QList<int> list = s.values();
-    std::sort(list.begin(), list.end());
-
-    QVariantList out;
-    for (int v : list) {
-        out << v;
+    // 1. Topological sort toàn bộ
+    QStringList order = topoSort();
+    if (order.isEmpty()) {
+        emit errorOccurred("Topological sort failed (maybe cycle in graph).");
+        return result;
     }
-    return out;
+
+    // 2. Xóa tất cả môn thuộc các kỳ đã hoàn thành
+    for (int i = 0; i < m_courses.size(); i++) {
+        if (m_semesters[i] <= completedSemesters) {
+            order.removeAll(m_courses[i]);
+        }
+    }
+
+    // 3. Thêm lại các môn đã tick (nếu còn trong graph)
+    QStringList mergedCourses = order;
+    for (const QString &c : completedCourses) {
+        if (!mergedCourses.contains(c) && m_courses.contains(c)) {
+            mergedCourses << c;
+        }
+    }
+
+    // 4. Chạy lại topoSort nhưng chỉ giữ các môn trong mergedCourses
+    QStringList sorted;
+    QSet<QString> keepSet = QSet<QString>(mergedCourses.begin(), mergedCourses.end());
+
+    // copy lại graph để lọc
+    int n = m_courses.size();
+    QVector<int> indeg(n, 0);
+    for (int u = 0; u < n; ++u) {
+        for (int v : m_adj[u]) {
+            if (keepSet.contains(m_courses[u]) && keepSet.contains(m_courses[v]))
+                indeg[v]++;
+        }
+    }
+
+    QList<int> q;
+    for (int i = 0; i < n; ++i) {
+        if (keepSet.contains(m_courses[i]) && indeg[i] == 0)
+            q.append(i);
+    }
+
+    while (!q.isEmpty()) {
+        int u = q.takeFirst();
+        if (!keepSet.contains(m_courses[u])) continue;
+        sorted << m_courses[u];
+        for (int v : m_adj[u]) {
+            if (keepSet.contains(m_courses[v])) {
+                indeg[v]--;
+                if (indeg[v] == 0)
+                    q.append(v);
+            }
+        }
+    }
+    // 5. Chia đều sorted vào các kỳ còn lại
+    int remainSemesters = targetSemesters - completedSemesters;
+    int total = sorted.size();
+    int base = total / remainSemesters;   // số môn tối thiểu mỗi kỳ
+    int extra = total % remainSemesters;  // số kỳ đầu được +1 môn
+    int idx = 0;
+    for (int i = 0; i < remainSemesters; ++i) {
+        int semNo = completedSemesters + i + 1;
+        int count = base + (i < extra ? 1 : 0);  // chia đều và dàn phần dư
+        QStringList semCourses;
+
+        for (int j = 0; j < count && idx < total; ++j, ++idx) {
+            semCourses << sorted[idx];
+        }
+
+        QVariantMap sem;
+        sem["semester"] = semNo;
+        sem["courses"] = semCourses;
+        result << sem;
+    }
+
+
+    return result;
 }
 
-QStringList CourseGraph::courses() const {
-    return QStringList(m_courses.begin(), m_courses.end());
-}
 
-
-QString CourseGraph::dotFromGraph() const {
+// Xu li do thi
+QString CourseGraph::dotFromCourses(const QStringList &courses) const {
     QString dot = "digraph prereq {\n"
                   "rankdir=LR;\n"
                   "node [shape=box, style=rounded, fontsize=10, margin=\"0.6,0.4\", width=0, height=0, fixedsize=false];\n"
                   "edge [arrowsize=0.7];\n";
-
-    for (int i = 0; i < m_courses.size(); ++i) {
-        dot += QString("\"%1 \";\n").arg(m_courses[i].toHtmlEscaped());
-    }
-
-    for (int u = 0; u < m_adj.size(); ++u) {
+    for (int u = 0; u < m_courses.size(); ++u) {
+        if (!courses.contains(m_courses[u])) continue;
+        dot += "\"" + m_courses[u] + "\";\n";
         for (int v : m_adj[u]) {
-            dot += QString("\"%1\" -> \"%2\";\n")
-            .arg(m_courses[u].toHtmlEscaped())
-                .arg(m_courses[v].toHtmlEscaped());
+            if (courses.contains(m_courses[v]))
+                dot += "\"" + m_courses[u] + "\" -> \"" + m_courses[v] + "\";\n";
         }
     }
-
     dot += "}\n";
     return dot;
 }
 
-bool CourseGraph::dfsTopoUtil(int v, QVector<int> &vis, QStringList &stack) const {
-    vis[v] = 1;
-    for (int nb : m_adj[v]) {
-        if (vis[nb] == 1) return false;
-        if (vis[nb] == 0) {
-            if (!dfsTopoUtil(nb, vis, stack)) return false;
-        }
-    }
-    vis[v] = 2;
-    stack.prepend(m_courses[v]);
-    return true;
+QString CourseGraph::svgBase64FromDot(const QString &dot) const {
+    QProcess process;
+    process.start("dot", QStringList() << "-Tsvg");
+    process.write(dot.toUtf8());
+    process.closeWriteChannel();
+    process.waitForFinished();
+    QByteArray svgData = process.readAllStandardOutput();
+    if (svgData.isEmpty()) return "";
+    return "data:image/svg+xml;base64," + svgData.toBase64();
 }
 
-QStringList CourseGraph::topoSort() {
-    int n = m_courses.size();
-    QVector<int> vis(n, 0);
-    QStringList result;
-    for (int i = 0; i < n; ++i) {
-        if (vis[i] == 0) {
-            if (!dfsTopoUtil(i, vis, result)) {
-                emit errorOccurred("Graph has a cycle!");
-                return QStringList{};
-            }
-        }
-    }
-    return result;
-}
-
-QString CourseGraph::svgBase64FromDot() {
-    QProcess proc;
-    proc.start("dot", {"-Tsvg"});
-    if (!proc.waitForStarted(3000)) {
-        emit errorOccurred("Graphviz 'dot' not found.");
-        return QString{};
-    }
-    proc.write(m_dot.toUtf8());
-    proc.closeWriteChannel();
-    proc.waitForFinished(5000);
-
-    QByteArray svg = proc.readAllStandardOutput();
-    if (svg.isEmpty()) {
-        emit errorOccurred("Graphviz returned no SVG.");
-        return QString{};
-    }
-
-    return "data:image/svg+xml;base64," + svg.toBase64();
-}
-
-
-
-Q_INVOKABLE void CourseGraph::setCourseSelected(const QString &course, bool selected) {
-    if (selected) {
-        if (!selectedCourses.contains(course))
-            selectedCourses.append(course);
-    } else {
-        selectedCourses.removeAll(course);
-    }
-}
-
-QString CourseGraph::svgForCourse(const QString &courseName) {
-    int idx = m_courses.indexOf(courseName);
-    if (idx < 0) {
-        emit errorOccurred("Course not found: " + courseName);
-        return QString{};
-    }
-
-    QSet<int> related;
-    related.insert(idx);
-
-    // prerequisite
-    for (int u = 0; u < m_adj.size(); ++u) {
-        for (int v : m_adj[u]) {
-            if (v == idx) related.insert(u);
-        }
-    }
-    // dependent
-    for (int v : m_adj[idx]) related.insert(v);
-
-    QString dot = "digraph prereq {\n\trankdir=LR;\n\tnode [shape=box, style=rounded];\n";
-    for (int i : related) {
-        dot += QString("\tN%1 [label=\"%2\"];\n").arg(i).arg(m_courses[i].toHtmlEscaped());
-    }
-    for (int u = 0; u < m_adj.size(); ++u) {
-        for (int v : m_adj[u]) {
-            if (related.contains(u) && related.contains(v)) {
-                dot += QString("\tN%1 -> N%2;\n").arg(u).arg(v);
-            }
-        }
-    }
-    dot += "}\n";
-
-    QProcess proc;
-    proc.start("dot", {"-Tsvg"});
-    if (!proc.waitForStarted(3000)) {
-        emit errorOccurred("Graphviz 'dot' not found.");
-        return QString{};
-    }
-    proc.write(dot.toUtf8());
-    proc.closeWriteChannel();
-    proc.waitForFinished(5000);
-
-    QByteArray svg = proc.readAllStandardOutput();
-    if (svg.isEmpty()) {
-        emit errorOccurred("Graphviz returned no SVG.");
-        return QString{};
-    }
-
-    return "data:image/svg+xml;base64," + svg.toBase64();
-}
-QString CourseGraph::svgForCourses(const QStringList &courseNames) {
-    QSet<int> related;
-
-    // tìm index các môn đã chọn
-    for (const QString &c : courseNames) {
-        int idx = m_courses.indexOf(c);
-        if (idx >= 0) related.insert(idx);
-    }
-
-    if (related.isEmpty()) {
-        emit errorOccurred("No courses selected.");
-        return QString{};
-    }
-
-    // thêm prerequisite và dependent của các môn chọn
-    QList<int> relList = related.values();
-    for (int k = 0; k < relList.size(); ++k) {
-        int idx = relList[k];
-        // prerequisite
-        for (int u = 0; u < m_adj.size(); ++u) {
-            for (int v : m_adj[u]) {
-                if (v == idx) related.insert(u);
-            }
-        }
-        // dependent
-        for (int v : m_adj[idx]) related.insert(v);
-    }
-
-    QString dot = "digraph prereq {\n\trankdir=LR;\n\tnode [shape=box, style=rounded];\n";
-    for (int i : related) {
-        dot += QString("\tN%1 [label=\"%2\"];\n").arg(i).arg(m_courses[i].toHtmlEscaped());
-    }
-    for (int u = 0; u < m_adj.size(); ++u) {
-        for (int v : m_adj[u]) {
-            if (related.contains(u) && related.contains(v)) {
-                dot += QString("\tN%1 -> N%2;\n").arg(u).arg(v);
-            }
-        }
-    }
-    dot += "}\n";
-
-    QProcess proc;
-    proc.start("dot", {"-Tsvg"});
-    if (!proc.waitForStarted(3000)) {
-        emit errorOccurred("Graphviz 'dot' not found.");
-        return QString{};
-    }
-    proc.write(dot.toUtf8());
-    proc.closeWriteChannel();
-    proc.waitForFinished(5000);
-
-    QByteArray svg = proc.readAllStandardOutput();
-    if (svg.isEmpty()) {
-        emit errorOccurred("Graphviz returned no SVG.");
-        return QString{};
-    }
-
-    return "data:image/svg+xml;base64," + svg.toBase64();
+QString CourseGraph::svgForPlan(const QStringList &courses) {
+    QString dot = dotFromCourses(courses);
+    return svgBase64FromDot(dot);
 }
